@@ -6,10 +6,10 @@ authors = ["Irishey <markirill21@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-Flask = {extras = ["async"], version = "^2.0.3"}
 Flask-Migrate = "^3.1.0"
 python-dotenv = "^0.20.0"
 psycopg2 = "^2.9.3"
+Flask = "^2.0.3"
 
 [tool.poetry.dev-dependencies]
 
