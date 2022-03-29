@@ -1,7 +1,8 @@
+from datetime import datetime
 import json
 
 from flask import Blueprint, jsonify, request
-from app.models import User
+from app.models import User, Message
 
 
 user_api = Blueprint('user_api', __name__)
@@ -23,3 +24,20 @@ def add_user():
     user = User(**data)
     user.add_user()
     return jsonify(user)
+
+
+@user_api.route('/api/message', methods=['POST'])
+def send_message():
+    data = json.loads(request.get_data().decode('utf-8'))
+    data['sent_datetime'] = datetime.now()
+    message = Message(**data)
+    message.add_message()
+    return jsonify(message)
+
+
+@user_api.route('/api/message', methods=['GET'])
+def get_messages():
+    data = json.loads(request.get_data().decode('utf-8'))
+    count = data['count']
+    id = data['id']
+    print(data)

@@ -16,7 +16,7 @@ class User(db.Model):
         self.username = username
     
     def add_user(self):
-        group = MessageGroup(self.nickname)
+        group = MessageGroup(self.nickname, self.telegram_id)
         db.session.add(group)
         db.session.add(self)
 
@@ -35,10 +35,12 @@ class User(db.Model):
 @dataclass
 class MessageGroup(db.Model):
     id: int = db.Column(db.Integer, primary_key=True)
+    telegram_id: int = db.Column(db.Integer, nullable=False, unique=True)
     group_name: str = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, group_name):
+    def __init__(self, group_name, telegram_id):
         self.group_name = group_name
+        self.telegram_id = telegram_id
 
 
 @dataclass
@@ -57,19 +59,20 @@ class GroupMember(db.Model):
 @dataclass
 class Message(db.Model):
     id: int = db.Column(db.Integer, primary_key=True)
-    from_id: int = db.Column(db.Integer, db.ForeignKey('user.id'),
-                                         nullable=False)
-    to_id: int = db.Column(db.Integer, db.ForeignKey('user.id'),
-                                       nullable=False)
+    telegram_id: int = db.Column(db.Integer, nullable=False)
     message_text: str = db.Column(db.String(255), nullable=False)
     sent_datetime: datetime = db.Column(db.DateTime(timezone=True),
                                         nullable=False)
     group_id: int = db.Column(db.Integer, db.ForeignKey('message_group.id'),
                                           nullable=False)
 
-    def __init__(self, from_id, to_id, message_text, sent_datetime, group_id):
-        self.from_id = from_id
-        self.to_id = to_id
+    def __init__(self, telegram_id, message_text, sent_datetime):
+        self.telegram_id = telegram_id
         self.message_text = message_text
         self.sent_datetime = sent_datetime
-        self.group_id = group_id
+    
+    def add_message(self):
+        group = MessageGroup.query.filter_by(telegram_id=self.telegram_id).first()
+        self.group_id = group.id
+        db.session.add(self)
+        db.session.commit()
