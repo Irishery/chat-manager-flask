@@ -63,12 +63,14 @@ class Message(db.Model):
     message_text: str = db.Column(db.String(255), nullable=False)
     sent_datetime: datetime = db.Column(db.DateTime(timezone=True),
                                         nullable=False)
+    nickname: str = db.Column(db.String(255), nullable=False)
     group_id: int = db.Column(db.Integer, db.ForeignKey('message_group.id'),
                                           nullable=False)
 
-    def __init__(self, telegram_id, message_text, sent_datetime):
+    def __init__(self, telegram_id, message_text, nickname, sent_datetime):
         self.telegram_id = telegram_id
         self.message_text = message_text
+        self.nickname = nickname
         self.sent_datetime = sent_datetime
     
     def add_message(self):

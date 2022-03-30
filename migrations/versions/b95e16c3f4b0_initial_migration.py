@@ -1,8 +1,8 @@
 """Initial migration
 
-Revision ID: 7145dd9f463e
+Revision ID: b95e16c3f4b0
 Revises: 
-Create Date: 2022-03-29 18:28:14.224056
+Create Date: 2022-03-30 19:44:26.922053
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '7145dd9f463e'
+revision = 'b95e16c3f4b0'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -46,6 +46,7 @@ def upgrade():
     sa.Column('telegram_id', sa.Integer(), nullable=False),
     sa.Column('message_text', sa.String(length=255), nullable=False),
     sa.Column('sent_datetime', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('nickname', sa.String(length=255), nullable=False),
     sa.Column('group_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['group_id'], ['message_group.id'], ),
     sa.PrimaryKeyConstraint('id')

@@ -203,6 +203,14 @@ body{
     float: right
 }
 
+.active-dialog {
+    background-color: rgba(13, 202, 240, 30%);
+}
+
+.active-dialog:hover {
+    background-color: rgba(13, 202, 240, 15%) !important;
+}
+
 .clearfix:after {
     visibility: hidden;
     display: block;
