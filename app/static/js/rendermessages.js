@@ -1,5 +1,7 @@
 import {get_messages, get_user} from './api_methods.js'
 
+let last_msg_id = 0;
+
 const set_active_dialog = (target) => {
   let active = document.getElementsByClassName('active-dialog');
 
@@ -18,9 +20,39 @@ const find_dialog_parent = (target) => {
   return parent.id == 'dialog' ? parent : false
 };
 
+
+const render_messages = async (user) => {
+  let messages = await get_messages(user.id, last_msg_id);
+  last_msg_id = messages[0].id
+  let chat_history = document.getElementById('chat-history')
+  console.log(messages);
+  
+  for (const message of messages) {
+    console.log(message)
+    chat_history.insertAdjacentHTML(
+      'afterbegin',
+      `
+    <li class="clearfix">
+    <div class="message-data">
+      <span class="message-data-time">${message.sent_datetime}</span>
+    </div>
+      <div class="message my-message">${message.message_text}</div>
+    </li>
+      `
+    )
+
+  }
+}
+
+
 const clear_dialog = () => {
   let header = document.getElementById('chat-header');
+  let chat_history = document.getElementById('chat-history');
+  let chat_input = document.getElementById('chat-input');
   header.remove();
+  chat_history.remove();
+  chat_input.remove();
+
 }
 
 const set_new_dialog = (user) => {
@@ -42,8 +74,23 @@ const set_new_dialog = (user) => {
          </div>
      </div>
  </div>
-</div>`
-)}
+</div>
+<div class="chat-history" id="chat-history">
+<ul class="m-b-0">
+</ul>
+</div>
+<div class="chat-message clearfix" id="chat-input">
+<div class="input-group mb-0">
+    <div class="input-group-prepend">
+        <span class="input-group-text"><i class="fa fa-send"></i></span>
+    </div>
+    <input type="text" class="form-control" placeholder="Enter text here...">                                    
+</div>
+</div>
+`)
+
+  render_messages(user);
+}
 
 
 document.addEventListener('click', async (event) => {
