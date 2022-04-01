@@ -10,6 +10,10 @@ Flask-Migrate = "^3.1.0"
 python-dotenv = "^0.20.0"
 psycopg2 = "^2.9.3"
 Flask = "^2.0.3"
+httpx = "^0.22.0"
+Flask-SocketIO = "^5.1.1"
+gevent-websocket = "^0.10.1"
+eventlet = "^0.33.0"
 
 [tool.poetry.dev-dependencies]
 

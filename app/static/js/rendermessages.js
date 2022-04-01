@@ -1,15 +1,20 @@
-import {get_messages, get_user} from './api_methods.js'
+import {get_messages, get_user, send_message} from './api_methods.js'
+import {socket} from './socket_client.js'
 
 let last_msg_id = 0;
 
+socket.on('send_message', function(Message) {
+  render_new_message(Message.message, 'user')
+});
+
 const set_active_dialog = (target) => {
   let active = document.getElementsByClassName('active-dialog');
-
   if (active.length !== 0) {
     active[0].classList.remove('active-dialog')
   };
   target.classList.add('active-dialog')
 }
+
 
 const find_dialog_parent = (target) => {
   if (target.parentNode.classList.contains('about')) {
@@ -21,22 +26,50 @@ const find_dialog_parent = (target) => {
 };
 
 
-const render_messages = async (user) => {
+const set_msg_onclick = async (user) => {
+  document.getElementById('send-msg').onclick = async () => {
+    let input = document.getElementById('chat-input');
+    if (input.value) {
+      let sent = await send_message(user.telegram_id, input.value, user.nickname)
+      // todo: check is status ok and show alert if its not
+      render_new_message(input.value, 'manager')
+    }
+  }
+}
+
+
+const render_new_message = (text, role) => {
+  let chat = document.getElementById('chat-history')
+
+  chat.insertAdjacentHTML(
+    'beforeend',
+    `    <li class="clearfix">
+    <div class="message-data ${(role == 'manager') ? 'text-right text-right d-flex flex-row-reverse' : ''}">
+      <span class="message-data-time">${new Date().toLocaleString().replace(",","").replace(/:.. /," ")}</span>
+    </div>
+      <div class="message ${(role == 'user') ? 'my-message' : 'other-message float-right'}">${text}</div>
+    </li>`
+  )
+}
+
+const render_user_messages = async (user) => {
   let messages = await get_messages(user.id, last_msg_id);
-  last_msg_id = messages[0].id
+  
+  if (messages) {
+    last_msg_id = messages[messages.length - 1].id;
+  };
+
   let chat_history = document.getElementById('chat-history')
-  console.log(messages);
   
   for (const message of messages) {
-    console.log(message)
     chat_history.insertAdjacentHTML(
       'afterbegin',
       `
     <li class="clearfix">
-    <div class="message-data">
+    <div class="message-data ${(message.role == 'manager') ? 'text-right text-right d-flex flex-row-reverse' : ''}">
       <span class="message-data-time">${message.sent_datetime}</span>
     </div>
-      <div class="message my-message">${message.message_text}</div>
+      <div class="message ${(message.role == 'user') ? 'my-message' : 'other-message float-right'}">${message.message_text}</div>
     </li>
       `
     )
@@ -48,7 +81,8 @@ const render_messages = async (user) => {
 const clear_dialog = () => {
   let header = document.getElementById('chat-header');
   let chat_history = document.getElementById('chat-history');
-  let chat_input = document.getElementById('chat-input');
+  let chat_input = document.getElementById('chat-input-div');
+  last_msg_id = 0;  
   header.remove();
   chat_history.remove();
   chat_input.remove();
@@ -75,21 +109,24 @@ const set_new_dialog = (user) => {
      </div>
  </div>
 </div>
-<div class="chat-history" id="chat-history">
-<ul class="m-b-0">
+<div class="chat-history">
+<ul class="m-b-0" id="chat-history">
 </ul>
 </div>
-<div class="chat-message clearfix" id="chat-input">
+<div class="chat-message clearfix" id="chat-input-div">
 <div class="input-group mb-0">
     <div class="input-group-prepend">
-        <span class="input-group-text"><i class="fa fa-send"></i></span>
+        <button class="btn btn-outline-secondary" type="button" id="send-msg">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-send" viewBox="0 0 16 16">
+          <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"/>
+          </svg></button>
     </div>
-    <input type="text" class="form-control" placeholder="Enter text here...">                                    
+    <input type="text" id="chat-input" class="form-control" placeholder="Enter text here...">                                    
 </div>
 </div>
 `)
-
-  render_messages(user);
+  set_msg_onclick(user);
+  render_user_messages(user);
 }
 
 
@@ -104,10 +141,9 @@ document.addEventListener('click', async (event) => {
       } else { return }
     }
 
-    let messages = await get_messages(target.value, 0)
     let user = await get_user(target.value)
-    console.log(messages)
-    console.log(user)
+    socket.emit('set_id', {socket_id: socket.id,
+                           user_id: user.id})
     set_active_dialog(target)
     set_new_dialog(user)
 });

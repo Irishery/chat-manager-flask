@@ -2,6 +2,11 @@ body{
     background-color: #f4f7f6;
     margin-top:20px;
 }
+
+ul {
+    list-style-type: none;
+}
+
 .card {
     background: #fff;
     transition: .5s;

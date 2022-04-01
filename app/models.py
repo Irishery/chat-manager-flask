@@ -1,7 +1,9 @@
-from app import db
+# from app import db
 from dataclasses import dataclass
 from datetime import datetime
+from flask_sqlalchemy import SQLAlchemy
 
+db = SQLAlchemy()
 
 @dataclass
 class User(db.Model):
@@ -66,13 +68,16 @@ class Message(db.Model):
     nickname: str = db.Column(db.String(255), nullable=False)
     group_id: int = db.Column(db.Integer, db.ForeignKey('message_group.id'),
                                           nullable=False)
+    role: str = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, telegram_id, message_text, nickname, sent_datetime):
+    def __init__(self, telegram_id, message_text, nickname, role, sent_datetime):
         self.telegram_id = telegram_id
         self.message_text = message_text
         self.nickname = nickname
+        self.role = role
         self.sent_datetime = sent_datetime
-    
+
+
     def add_message(self):
         group = MessageGroup.query.filter_by(telegram_id=self.telegram_id).first()
         self.group_id = group.id

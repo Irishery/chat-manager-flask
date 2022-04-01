@@ -21,8 +21,14 @@ const get_messages = (id, last_msg_id) => {
     return base_request('message', 'GET', {msg_id: last_msg_id, id: id})
 };
 
+const send_message = (id, text, nickname) => {
+    return base_request('message/manager', 'POST', {telegram_id: id,
+                                                    message_text: text,
+                                                    nickname: nickname})
+}
+
 const get_user = (id) => {
     return base_request('user', 'GET', {id: id, type: 'id'})
 };
 
-export {get_messages, get_user};
+export {get_messages, get_user, send_message};

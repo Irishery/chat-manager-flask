@@ -1,12 +1,16 @@
+import httpx
+
 from datetime import datetime
 from sqlalchemy import desc, text
-import json
 
 from flask import Blueprint, jsonify, request
 from app.models import User, Message
+from app.socket.socket import send_message
 
 
 user_api = Blueprint('user_api', __name__)
+
+client = httpx.Client()
 
 @user_api.route('/api/user/', methods=["GET"])
 def get_user():
@@ -31,12 +35,14 @@ def add_user():
     return jsonify(user)
 
 
-@user_api.route('/api/message/', methods=['POST'])
-def send_message():
+@user_api.route('/api/message/user/', methods=['POST'])
+def send_message_to_manager():
     data = request.args.to_dict()
     data['sent_datetime'] = datetime.now()
+    data['role'] = 'user'
     message = Message(**data)
     message.add_message()
+    send_message(data['message_text'], data['telegram_id'])
     return jsonify(message)
 
 
@@ -54,3 +60,24 @@ def get_messages():
     return jsonify(Message.query.filter(
         Message.id < msg_id, Message.telegram_id==tel_id).
         order_by(desc(text('id'))).limit(20).all())
+
+
+@user_api.route('/api/message/manager/', methods=['POST'])
+def send_message_to_user():
+    print(request)
+    data = request.args.to_dict()
+    data['sent_datetime'] = datetime.now()
+    data['role'] = 'manager'
+    message = Message(**data)
+    message.add_message()
+
+    r = client.request(
+                "post", "http://127.0.0.1:8181/send_message/",
+                params=data,
+                headers={'content-type': 'application/json'}
+    )
+
+    if r.json()['status'] == 'ok':
+        return {'status': 'ok'}
+    else:
+        return {'status': 'error'}
