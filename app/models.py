@@ -1,9 +1,40 @@
-# from app import db
 from dataclasses import dataclass
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
+from flask_login import LoginManager
+from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
+login_manager = LoginManager()
+
+
+@dataclass
+class Manager(db.Model, UserMixin):
+    id: int = db.Column(db.Integer, primary_key=True)
+    name: str = db.Column(db.String(255), nullable=False)   
+    login: str = db.Column(db.String(255), nullable=False)
+    password_hash: str = db.Column(db.String(255), nullable=False)
+
+    def __init__(self, name, login, password,
+                 last_enter=datetime.now()):
+        self.name = name
+        self.login = login
+        self.set_password(password)
+        self.last_enter = last_enter
+    
+    def get_id(self):
+        return str(self.id)
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+    
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
+    
+    def add_role(self, role):
+        self.roles.append(role)
+
 
 @dataclass
 class User(db.Model):
@@ -83,3 +114,8 @@ class Message(db.Model):
         self.group_id = group.id
         db.session.add(self)
         db.session.commit()
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return Manager.query.get(int(user_id))

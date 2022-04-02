@@ -10,9 +10,9 @@ socket.on('send_message', function(Message) {
 const set_active_dialog = (target) => {
   let active = document.getElementsByClassName('active-dialog');
   if (active.length !== 0) {
-    active[0].classList.remove('active-dialog')
+    active[0].classList.remove('active-dialog');
   };
-  target.classList.add('active-dialog')
+  target.classList.add('active-dialog');
 }
 
 
@@ -30,9 +30,10 @@ const set_msg_onclick = async (user) => {
   document.getElementById('send-msg').onclick = async () => {
     let input = document.getElementById('chat-input');
     if (input.value) {
-      let sent = await send_message(user.telegram_id, input.value, user.nickname)
+      let sent = await send_message(user.telegram_id, input.value, user.nickname);
       // todo: check is status ok and show alert if its not
-      render_new_message(input.value, 'manager')
+      render_new_message(input.value, 'manager');
+      input.value = '';
     }
   }
 }
@@ -49,7 +50,7 @@ const set_msg_loader = async (user) => {
 
 
 const render_new_message = (text, role) => {
-  let chat = document.getElementById('chat-history')
+  let chat = document.getElementById('chat-history');
 
   chat.insertAdjacentHTML(
     'beforeend',
@@ -60,7 +61,7 @@ const render_new_message = (text, role) => {
     </div>
       <div class="message ${(role == 'user') ? 'my-message' : 'other-message float-right'}">${text}</div>
     </li>`
-  )
+  );
 }
 
 const render_user_messages = async (user) => {

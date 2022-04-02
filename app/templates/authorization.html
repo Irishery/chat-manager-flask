@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block styles %}
+<link href="../static/css/authorization.css" rel="stylesheet"/>
+{% endblock %}
+{% block content %}
+<section class="gradient-custom">
+    <div class="container mt-5 py-4 h-100">
+      <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+          <div class="card bg-dark text-white" style="border-radius: 1rem;">
+            <form method="post">
+            <div class="card-body p-5 text-center">
+            
+              <div class="mb-md-5 mt-md-3">
+                <h2 class="fw-bold mb-5 text-uppercase">
+                    {% if action == 'sign_up' %}
+                        Sign Up
+                    {% else %}
+                        Sign In
+                    {% endif %}
+                </h2>
+                <div>
+                    {{ form.csrf_token }}
+                </div>
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="alert alert-danger">
+                        {{ messages[0] }}.
+                    </div>
+                {% endif %}
+                {% endwith %}
+                {% for field in form if field.name != 'csrf_token' %}
+                <div class="form-floating form-white mb-4">
+                    {% if field.type == "StringField" and field.id == "password" %}
+                    {{ field(class_="form-control", type_="password") }}
+
+                    {% elif field.type == "SubmitField" %}
+                    {{ field(class_="btn btn-primary form-control") }}
+
+                    {% elif field.type == "BooleanField" %}
+                    <div>
+                        {{ field.label(for_=field.id, class_="form-label") }}
+                        {{ field(class_="form-check-input") }}
+                    </div>
+
+                    {% else %}
+                    {{ field(class_="form-control") }}
+                    {% endif %}
+
+                    {% if not(field.type == "SubmitField" or field.type == "BooleanField") %}
+                    {{ field.label(for_=field.id, class_="form-label text-body") }}
+                    {% endif %}
+
+                    {% for error in field.errors %}
+                        <div class="error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+  
+              </div>
+  
+              <div>
+                {% if action == 'sign_up' %}
+                    <p class="mb-0">Already have an account? <a href="/sign_in" class="text-white-50 fw-bold">Sign In</a></p>
+                {% else %}
+                    <p class="mb-0">Don't have an account? <a href="/sign_up" class="text-white-50 fw-bold">Sign Up</a></p>
+                {% endif %}
+              </div> 
+  
+            </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

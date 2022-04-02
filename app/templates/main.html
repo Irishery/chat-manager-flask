@@ -11,12 +11,9 @@
         <div class="card chat-app">
             <div id="plist" class="people-list">
                 <div class="input-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text"><i class="fa fa-search"></i></span>
-                    </div>
-                    <input type="text" class="form-control" placeholder="Search...">
+                    <input type="text" onkeyup="SearchChat()" id="find-user-input" class="form-control" placeholder="Search...">
                 </div>
-                <ul class="list-unstyled chat-list mt-2 mb-0">
+                <ul class="list-unstyled chat-list mt-2 mb-0" id="user-list">
                     {% for user in users %}
                     <li class="clearfix d-flex" id="dialog" value="{{ user.id }}">
                         <img src="https://media.istockphoto.com/photos/businessman-silhouette-as-avatar-or-default-profile-picture-picture-id476085198?b=1&k=20&m=476085198&s=170667a&w=0&h=Ct4e1kIOdCOrEgvsQg4A1qeuQv944pPFORUQcaGw4oI=" alt="avatar">
@@ -26,20 +23,8 @@
                         </div>
                     </li>
                     {% endfor %}
-                    <li class="clearfix d-flex" value="">
-                        <img src="https://media.istockphoto.com/photos/businessman-silhouette-as-avatar-or-default-profile-picture-picture-id476085198?b=1&k=20&m=476085198&s=170667a&w=0&h=Ct4e1kIOdCOrEgvsQg4A1qeuQv944pPFORUQcaGw4oI=" alt="avatar">
-                        <div class="about">
-                            <div class="name">ser.nickname</div>
-                            <!-- <div class="status"> <i class="fa fa-circle offline"></i> left 7 mins ago </div>                                             -->
-                        </div>
-                    </li>
                 </ul>
             </div>
-            <!-- <div class="chat d-flex"> 
-                <div class="align-self-center">
-                        <p>Select dialog</p>
-                </div>
-            </div> -->
             <svg class="bi" width="32" height="32" fill="currentColor">
                 <use xlink:href="bootstrap-icons.svg#heart-fill"/>
               </svg>
@@ -61,4 +46,28 @@
 <script type="module" src="../static/js/rendermessages.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
 <script type="module" src="../static/js/socket_client.js" charset="utf-8"></script>
+<script>
+    function SearchChat() {
+      var input, filter, ul, li, a, i, txtValue;
+      input = document.getElementById('find-user-input');
+      filter = input.value.toUpperCase();
+      ul = document.getElementById("user-list");
+      li = ul.getElementsByTagName('li');
+
+      for (i = 0; i < li.length; i++) {
+        a = li[i].getElementsByClassName("name")[0];
+        console.log(a.textContent)
+        txtValue = a.textContent || a.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          li[i].style.display = "";
+          if (!(li[i].classList.contains('d-flex'))) {
+            li[i].classList.add('d-flex');
+          }
+        } else {
+          li[i].classList.remove('d-flex');
+          li[i].style.display = "none";
+        }
+      }
+    }
+    </script>
 {% endblock %}
