@@ -64,7 +64,6 @@ def get_messages():
 
 @user_api.route('/api/message/manager/', methods=['POST'])
 def send_message_to_user():
-    print(request)
     data = request.args.to_dict()
     data['sent_datetime'] = datetime.now()
     data['role'] = 'manager'

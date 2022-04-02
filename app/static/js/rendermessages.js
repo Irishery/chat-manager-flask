@@ -38,12 +38,23 @@ const set_msg_onclick = async (user) => {
 }
 
 
+const set_msg_loader = async (user) => {
+  let chat = document.getElementById('chat-history-div')
+  chat.onscroll = function() {
+    if (chat.scrollTop == 0) {
+      render_user_messages(user);
+    }
+  }
+}
+
+
 const render_new_message = (text, role) => {
   let chat = document.getElementById('chat-history')
 
   chat.insertAdjacentHTML(
     'beforeend',
-    `    <li class="clearfix">
+    `  
+    <li class="clearfix">
     <div class="message-data ${(role == 'manager') ? 'text-right text-right d-flex flex-row-reverse' : ''}">
       <span class="message-data-time">${new Date().toLocaleString().replace(",","").replace(/:.. /," ")}</span>
     </div>
@@ -54,12 +65,25 @@ const render_new_message = (text, role) => {
 
 const render_user_messages = async (user) => {
   let messages = await get_messages(user.id, last_msg_id);
-  
+  let chat_history = document.getElementById('chat-history')  
+
+  if (messages.length == 0) {
+    let dialog_begin = document.getElementById('dialog-begin-flag');
+    if (dialog_begin) {
+      return
+    }
+    chat_history.insertAdjacentHTML(
+      'afterbegin',
+      `
+      <p class="text-center" id="dialog-begin-flag">Начало дилога</p>
+      `
+    )
+    return
+  }
   if (messages) {
     last_msg_id = messages[messages.length - 1].id;
   };
 
-  let chat_history = document.getElementById('chat-history')
   
   for (const message of messages) {
     chat_history.insertAdjacentHTML(
@@ -80,7 +104,7 @@ const render_user_messages = async (user) => {
 
 const clear_dialog = () => {
   let header = document.getElementById('chat-header');
-  let chat_history = document.getElementById('chat-history');
+  let chat_history = document.getElementById('chat-history-div');
   let chat_input = document.getElementById('chat-input-div');
   last_msg_id = 0;  
   header.remove();
@@ -109,7 +133,7 @@ const set_new_dialog = (user) => {
      </div>
  </div>
 </div>
-<div class="chat-history">
+<div class="chat-history d-flex flex-column" id="chat-history-div">
 <ul class="m-b-0" id="chat-history">
 </ul>
 </div>
@@ -126,6 +150,7 @@ const set_new_dialog = (user) => {
 </div>
 `)
   set_msg_onclick(user);
+  set_msg_loader(user);
   render_user_messages(user);
 }
 

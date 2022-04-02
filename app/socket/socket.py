@@ -34,15 +34,12 @@ def set_id(data):
             pass
     else:
         dialogs[data['user_id']] = [data['socket_id']]
-    
-    print(dialogs)
 
 
 def send_message(message, telegram_id):
     id = User.query.filter_by(telegram_id=telegram_id).first().id
     for socket in dialogs[id]:
         emit('send_message', {'message': message}, room=socket, namespace='/')
-    print(dialogs)
 
 @socketio.on('message')
 def handle_message(data):
@@ -51,8 +48,6 @@ def handle_message(data):
 
 @socketio.on('set_id')
 def handle_id(data):
-    print('SET ID')
-    print(data)
     set_id(data)
     print('received message: ' + str(data))
 
@@ -68,10 +63,6 @@ def test_connect(auth):
 
 @socketio.on('disconnect')
 def test_disconnect():
-    print(dialogs.items())
-    print(request.sid)
-    print(request.namespace)
     remove_id(request.sid)
-    print(dialogs)
 
     print('Client disconnected')
