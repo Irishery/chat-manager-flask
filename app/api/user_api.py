@@ -5,12 +5,12 @@ from sqlalchemy import desc, text
 
 from flask import Blueprint, jsonify, request
 from app.models import User, Message
-from app.socket.socket import send_message
+from app.sockets.socket import send_message
 
 
 user_api = Blueprint('user_api', __name__)
 
-client = httpx.Client()
+client = httpx.Client(timeout=None)
 
 @user_api.route('/api/user/', methods=["GET"])
 def get_user():

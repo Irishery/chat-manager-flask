@@ -1,7 +1,5 @@
-from os import remove
-from socket import socket
-from flask_socketio import SocketIO, send, emit
-from flask import request, session
+from flask_socketio import SocketIO, emit
+from flask import request
 from app.models import User
 
 socketio = SocketIO()
@@ -38,8 +36,10 @@ def set_id(data):
 
 def send_message(message, telegram_id):
     id = User.query.filter_by(telegram_id=telegram_id).first().id
-    for socket in dialogs[id]:
-        emit('send_message', {'message': message}, room=socket, namespace='/')
+    if len(dialogs) > 0:
+        for socket in dialogs[id]:
+            emit('send_message', {'message': message}, room=socket, namespace='/')
+
 
 @socketio.on('message')
 def handle_message(data):

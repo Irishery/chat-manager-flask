@@ -22,6 +22,18 @@ ul {
     left: 0;
     top: 0;
     padding: 20px;
+    padding-right: 5px;
+    max-height: 680px;
+}
+
+.dialogs-group {
+    overflow: auto;
+    max-height: 580px;
+}
+
+.input-group input {
+    padding-right: 0.75rem;
+    margin-right: 0.75rem;
 }
 
 .chat-app .chat {
@@ -38,7 +50,8 @@ ul {
 .people-list .chat-list li {
     padding: 10px 15px;
     list-style: none;
-    border-radius: 3px
+    border-radius: 3px;
+    max-height: 650px;
 }
 
 .people-list .chat-list li:hover {
@@ -51,7 +64,13 @@ ul {
 }
 
 .people-list .chat-list li .name {
-    font-size: 15px
+    font-size: 15px;
+    max-height: 45px;
+}
+
+.people-list .chat-list li .name:hover {
+    font-size: 15px;
+    max-height: 45px;
 }
 
 .people-list .chat-list img {
@@ -66,7 +85,10 @@ ul {
 
 .people-list .about {
     float: left;
-    padding-left: 8px
+    padding-left: 8px;
+    max-width: 140px;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .people-list .status {
@@ -225,18 +247,17 @@ ul {
 }
 
 .chat-history {
-    max-height: 650px;
+    max-height: 550px;
     overflow-x: auto;
 }
 
 @media only screen and (max-width: 767px) {
     .chat-app .people-list {
-        height: 465px;
+        max-height: 550px;
         width: 100%;
         overflow-x: auto;
         background: #fff;
         left: -400px;
-        display: none
     }
     .chat-app .people-list.open {
         left: 0

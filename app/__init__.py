@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_migrate import Migrate
-from app.socket.socket import socketio
+from app.sockets.socket import socketio
 from app.models import db, login_manager
 
 

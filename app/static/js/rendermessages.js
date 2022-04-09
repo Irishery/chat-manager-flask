@@ -36,6 +36,18 @@ const set_msg_onclick = async (user) => {
       input.value = '';
     }
   }
+  document.addEventListener('keydown', async (event) => {
+    var name = event.key;
+    if (name === 'Enter') {
+      let input = document.getElementById('chat-input');
+      if (input.value) {
+        let sent = await send_message(user.telegram_id, input.value, user.nickname);
+        // todo: check is status ok and show alert if its not
+        render_new_message(input.value, 'manager');
+        input.value = '';
+      }
+    }
+  }, false);
 }
 
 
@@ -87,12 +99,13 @@ const render_user_messages = async (user) => {
 
   
   for (const message of messages) {
+    let date = new Date(message.sent_datetime)
     chat_history.insertAdjacentHTML(
       'afterbegin',
       `
     <li class="clearfix">
     <div class="message-data ${(message.role == 'manager') ? 'text-right text-right d-flex flex-row-reverse' : ''}">
-      <span class="message-data-time">${message.sent_datetime}</span>
+      <span class="message-data-time">${date.toLocaleString().replace(",","").replace(/:.. /," ")}</span>
     </div>
       <div class="message ${(message.role == 'user') ? 'my-message' : 'other-message float-right'}">${message.message_text}</div>
     </li>
@@ -140,14 +153,14 @@ const set_new_dialog = (user) => {
 </div>
 <div class="chat-message clearfix" id="chat-input-div">
 <div class="input-group mb-0">
-    <div class="input-group-prepend">
-        <button class="btn btn-outline-secondary" type="button" id="send-msg">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-send" viewBox="0 0 16 16">
-          <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"/>
-          </svg></button>
-    </div>
     <input type="text" id="chat-input" class="form-control" placeholder="Enter text here...">                                    
-</div>
+    <div class="input-group-prepend">
+      <button class="btn btn-outline-secondary" type="button" id="send-msg">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-send" viewBox="0 0 16 16">
+        <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"/>
+        </svg></button>
+    </div>
+    </div>
 </div>
 `)
   set_msg_onclick(user);

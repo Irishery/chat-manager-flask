@@ -13,6 +13,7 @@
                 <div class="input-group">
                     <input type="text" onkeyup="SearchChat()" id="find-user-input" class="form-control" placeholder="Search...">
                 </div>
+                <div class="dialogs-group">
                 <ul class="list-unstyled chat-list mt-2 mb-0" id="user-list">
                     {% for user in users %}
                     <li class="clearfix d-flex" id="dialog" value="{{ user.id }}">
@@ -24,16 +25,8 @@
                     </li>
                     {% endfor %}
                 </ul>
+                </div>
             </div>
-            <svg class="bi" width="32" height="32" fill="currentColor">
-                <use xlink:href="bootstrap-icons.svg#heart-fill"/>
-              </svg>
-              <svg class="bi" width="32" height="32" fill="currentColor">
-                <use xlink:href="bootstrap-icons.svg#toggles"/>
-              </svg>
-              <svg class="bi" width="32" height="32" fill="currentColor">
-                <use xlink:href="bootstrap-icons.svg#shop"/>
-              </svg>
             <div class="chat justify-content-between d-flex" id="chat-win">
             </div>
         </div>
