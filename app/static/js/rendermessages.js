@@ -2,6 +2,7 @@ import {get_messages, get_user, send_message} from './api_methods.js'
 import {socket} from './socket_client.js'
 
 let last_msg_id = 0;
+let typing = false
 
 socket.on('send_message', function(Message) {
   render_new_message(Message.message, 'user')
@@ -26,25 +27,52 @@ const find_dialog_parent = (target) => {
 };
 
 
+const block_send_on_typing = (input) => {
+  let typingTimer;
+  let doneTypingInterval = 2000;
+  let send_button = document.getElementById('send-msg')
+
+  //on keyup, start the countdown
+  input.addEventListener('keyup', () => {
+    typing = true
+    send_button.disabled = true
+    clearTimeout(typingTimer);
+    if (input.value) {
+        typingTimer = setTimeout(doneTyping, doneTypingInterval);
+    }
+  });
+
+  //user is "finished typing," do something
+  function doneTyping () {
+    send_button.disabled = false
+    typing = false
+  }
+}
+
+
 const set_msg_onclick = async (user) => {
+  block_send_on_typing(document.getElementById('chat-input'))
+  
   document.getElementById('send-msg').onclick = async () => {
     let input = document.getElementById('chat-input');
-    if (input.value) {
-      let sent = await send_message(user.telegram_id, input.value, user.nickname);
+    let text = input.value
+    if (input.value && !typing) {
+      input.value = ''
+      let sent = await send_message(user.telegram_id, text, user.nickname);
       // todo: check is status ok and show alert if its not
-      render_new_message(input.value, 'manager');
-      input.value = '';
+      render_new_message(text, 'manager');
     }
   }
   document.addEventListener('keydown', async (event) => {
     var name = event.key;
     if (name === 'Enter') {
       let input = document.getElementById('chat-input');
-      if (input.value) {
-        let sent = await send_message(user.telegram_id, input.value, user.nickname);
+      let text = input.value
+      if (input.value && !typing) {
+        input.value = ''
+        let sent = await send_message(user.telegram_id, text, user.nickname);
         // todo: check is status ok and show alert if its not
-        render_new_message(input.value, 'manager');
-        input.value = '';
+        render_new_message(text, 'manager');
       }
     }
   }, false);
