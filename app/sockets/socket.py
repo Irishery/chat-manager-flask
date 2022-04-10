@@ -4,41 +4,57 @@ from app.models import User
 
 socketio = SocketIO()
 
-dialogs = {
+dialogs_with_sockets = {
 
 }
 
-sockets = {
+sockets_with_dialog = {
 
 }
 
-def remove_id(id):
-    if id in sockets.keys():
-        dialogs[sockets[id]].remove(id)
-        sockets.pop(id, None)
+socket_ids = []
+
+def remove_id(id, absolute=False):
+    if id in sockets_with_dialog.keys():
+        dialog_id = sockets_with_dialog[id]
+        if dialog_id in dialogs_with_sockets.keys():
+            dialogs_with_sockets[sockets_with_dialog[id]].remove(id)
+        sockets_with_dialog.pop(id, None)
+    
+    if absolute:
+        socket_ids.remove(id)
+
 
 def set_id(data):
 
-    if data['socket_id'] in sockets.keys():
-        if sockets[data['socket_id']] != data['user_id']:
+    if data['socket_id'] in sockets_with_dialog.keys():
+        if sockets_with_dialog[data['socket_id']] != data['user_id']:
             remove_id(data['socket_id'])
 
-    sockets[data['socket_id']] = data['user_id']
+    sockets_with_dialog[data['socket_id']] = data['user_id']
 
-    if data['user_id'] in dialogs.keys():
-        if data['socket_id'] not in dialogs[data['user_id']]:
-            dialogs[data['user_id']].append(data['socket_id'])
+    if data['user_id'] in dialogs_with_sockets.keys():
+        if data['socket_id'] not in dialogs_with_sockets[data['user_id']]:
+            dialogs_with_sockets[data['user_id']].append(data['socket_id'])
         else:
             pass
     else:
-        dialogs[data['user_id']] = [data['socket_id']]
+        dialogs_with_sockets[data['user_id']] = [data['socket_id']]
 
 
-def send_message(message, telegram_id):
-    id = User.query.filter_by(telegram_id=telegram_id).first().id
-    if len(dialogs) > 0:
-        for socket in dialogs[id]:
-            emit('send_message', {'message': message}, room=socket, namespace='/')
+def send_message(message, user):
+    if len(dialogs_with_sockets) > 0 and user.id in dialogs_with_sockets.keys():
+        for socket in dialogs_with_sockets[user.id]:
+            emit('send_message', {'message': message}, room=socket,
+                                                       namespace='/')
+
+    for socket in socket_ids:
+        if socket in sockets_with_dialog.keys():
+            if sockets_with_dialog[socket] == user.id:
+                continue
+
+        emit('send_notification', {'id': user.id, 'name': user.nickname}, 
+                                    room=socket, namespace='/')
 
 
 @socketio.on('message')
@@ -59,10 +75,11 @@ def handle_json(json):
 
 @socketio.on('connect')
 def test_connect(auth):
+    socket_ids.append(request.sid)
     emit('my response', {'data': 'Connected'})
+
 
 @socketio.on('disconnect')
 def test_disconnect():
-    remove_id(request.sid)
-
+    remove_id(request.sid, absolute=True)
     print('Client disconnected')

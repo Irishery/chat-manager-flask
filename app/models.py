@@ -3,6 +3,7 @@ from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from flask_login import LoginManager
+from sqlalchemy.dialects.postgresql import ARRAY
 from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
@@ -15,6 +16,7 @@ class Manager(db.Model, UserMixin):
     name: str = db.Column(db.String(255), nullable=False)   
     login: str = db.Column(db.String(255), nullable=False)
     password_hash: str = db.Column(db.String(255), nullable=False)
+    unread_msgs: list = db.Column(ARRAY(db.String(255)), nullable=True)
 
     def __init__(self, name, login, password,
                  last_enter=datetime.now()):

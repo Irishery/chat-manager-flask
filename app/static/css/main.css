@@ -156,7 +156,8 @@ ul {
     font-size: 16px;
     border-radius: 7px;
     display: inline-block;
-    position: relative
+    position: relative;
+    max-width: 600px;
 }
 
 .chat .chat-history .message:after {
@@ -193,7 +194,6 @@ ul {
 
 .chat .chat-history .other-message {
     background: #e8f1f3;
-    text-align: right
 }
 
 .chat .chat-history .other-message:after {
@@ -227,6 +227,14 @@ ul {
 
 .float-right {
     float: right
+}
+
+#manager-id {
+    display: none;
+}
+
+.diaolg-id {
+    display: none;
 }
 
 .active-dialog {

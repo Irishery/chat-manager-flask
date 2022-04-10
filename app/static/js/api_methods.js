@@ -25,10 +25,21 @@ const send_message = (id, text, nickname) => {
     return base_request('message/manager', 'POST', {telegram_id: id,
                                                     message_text: text,
                                                     nickname: nickname})
-}
+};
+
+const get_notifications = (id) => {
+    return base_request('manager/notifications', 'GET', {id: id})
+};
+
+const del_notification = (manager_id, user_id, nickname) => {
+    return base_request('manager/notifications', 'DELETE', 
+                        {manager_id: manager_id, user_id: user_id,
+                        nickname: nickname})
+};
 
 const get_user = (id) => {
     return base_request('user', 'GET', {id: id, type: 'id'})
 };
 
-export {get_messages, get_user, send_message};
+export {get_messages, get_user, send_message, get_notifications, 
+        del_notification};

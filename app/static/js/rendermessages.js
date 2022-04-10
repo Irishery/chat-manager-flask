@@ -214,3 +214,6 @@ document.addEventListener('click', async (event) => {
     set_active_dialog(target)
     set_new_dialog(user)
 });
+
+
+export {set_active_dialog, set_new_dialog};

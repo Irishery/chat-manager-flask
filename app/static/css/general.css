@@ -16,3 +16,27 @@ body {
     right: 0%;
     position: absolute;
 }
+
+.dropdown-item {
+    max-width: 350px;
+    white-space: normal;
+}
+
+.dropdown-toggle {
+    white-space: normal;
+}
+
+.extra-nav-items {
+    display: flex;
+    align-items: center;
+}
+
+#default-notification p {
+    margin: 0;
+}
+
+#dropdown-notify {
+    overflow-y: auto;
+    max-height: 400px;
+    min-width: 15rem;
+}

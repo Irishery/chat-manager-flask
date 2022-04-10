@@ -1,10 +1,10 @@
 import httpx
 
 from datetime import datetime
-from sqlalchemy import desc, text
+from sqlalchemy import desc, text, update
 
 from flask import Blueprint, jsonify, request
-from app.models import User, Message
+from app.models import User, Message, Manager, db
 from app.sockets.socket import send_message
 
 
@@ -35,6 +35,40 @@ def add_user():
     return jsonify(user)
 
 
+@user_api.route('/api/manager/notifications/', methods=['GET'])
+def get_notifications():
+    data = request.args.to_dict()
+    manager_id = data['id']
+    notifications = Manager.query.filter_by(id=manager_id).first().unread_msgs
+    resp = {
+        'notifications': []
+    }
+
+    for notify in set(notifications):
+        id, name = notify.split('_')
+        validated_notify = {'id': id, 'name': name}
+        resp['notifications'].append(validated_notify)
+
+    return resp
+
+
+@user_api.route('/api/manager/notifications/', methods=["DELETE"])
+def delete_notifications():
+    data = request.args.to_dict()
+    manager_id = data['manager_id']
+    user_id = data['user_id']
+    nickname = data['nickname']
+
+    db.session.execute(update(Manager).filter_by(id=manager_id)\
+    .values(unread_msgs=text(f'array_remove({Manager.unread_msgs.name}, :tag)')),
+    {'tag': str(user_id) + f'_{nickname}'})
+
+    db.session.commit()
+
+    return {'response': f'notifications from the user-{user_id} \
+                            have been successfully deleted'}
+
+
 @user_api.route('/api/message/user/', methods=['POST'])
 def send_message_to_manager():
     data = request.args.to_dict()
@@ -42,7 +76,17 @@ def send_message_to_manager():
     data['role'] = 'user'
     message = Message(**data)
     message.add_message()
-    send_message(data['message_text'], data['telegram_id'])
+
+    user = User.query.filter_by(telegram_id=data['telegram_id']).first()
+
+    db.session.execute(update(
+        Manager
+    ).values(unread_msgs=text(f'array_append({Manager.unread_msgs.name}, :tag)')),
+    {'tag': str(user.id) + f'_{user.nickname}'})
+
+    db.session.commit()
+
+    send_message(data['message_text'], user)
     return jsonify(message)
 
 
