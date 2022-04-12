@@ -167,7 +167,7 @@ const set_new_dialog = (user) => {
  <div class="row">
      <div class="col-lg-6">
          <a href="javascript:void(0);" data-toggle="modal" data-target="#view_info">
-             <img src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="avatar">
+             <img src="../${user.avatar_path}" alt="avatar">
          </a>
          <div class="chat-about">
              <h6 class="m-b-0">${user.nickname}</h6>

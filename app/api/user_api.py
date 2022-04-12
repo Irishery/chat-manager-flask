@@ -1,4 +1,8 @@
 import httpx
+import base64
+
+from PIL import Image
+from io import BytesIO
 
 from datetime import datetime
 from sqlalchemy import desc, text, update
@@ -33,6 +37,23 @@ def add_user():
     user = User(**data)
     user.add_user()
     return jsonify(user)
+
+
+@user_api.route('/api/user/pic/', methods=['POST'])
+def add_user_avatar():
+    data = request.get_data()
+    params = request.args.to_dict()
+    telegram_id = params['telegram_id']
+    avatar_path = f'static/images/avatar_{telegram_id}.jpg'
+    
+    user = User.query.filter_by(telegram_id=telegram_id).first()
+    user.avatar_path = avatar_path
+    db.session.commit()
+    
+    im = Image.open(BytesIO(base64.b64decode(data)))
+    im.save('app/' + avatar_path, 'jpeg')
+    
+    return {'ok': 'ok'}
 
 
 @user_api.route('/api/manager/notifications/', methods=['GET'])
