@@ -1,5 +1,6 @@
 import {ban_user, get_messages, get_user, send_message} from './api_methods.js'
 import {socket} from './socket_client.js'
+import {remove_notify_element} from './notifications.js'
 
 let last_msg_id = 0;
 let typing = false
@@ -18,12 +19,16 @@ const set_active_dialog = (target) => {
 
 
 const find_dialog_parent = (target) => {
+  if (target.parentNode.classList.contains('avatar_and_nickname')) {
+    let parent = target.parentNode.parentNode
+    return parent.id.slice(0, 6) == 'dialog' ? parent : false
+  }
   if (target.parentNode.classList.contains('about')) {
     let parent = target.parentNode.parentNode
-    return parent.id == 'dialog' ? parent : false
+    return parent.classList.contains('avatar_and_nickname') ? parent.parentNode : false
   }
-  let parent = target.parentNode
-  return parent.id == 'dialog' ? parent : false
+  let parent = target.parentNode.parentNode
+  return parent.id.slice(0, 6) == 'dialog' ? parent : false
 };
 
 
@@ -63,6 +68,7 @@ const set_chat_onclicks = async (user) => {
       render_new_message(text, 'manager');
     }
   }
+
   document.addEventListener('keydown', async (event) => {
     var name = event.key;
     if (name === 'Enter') {
@@ -76,25 +82,6 @@ const set_chat_onclicks = async (user) => {
       }
     }
   }, false);
-
-  document.getElementById('extra-info-btn').onclick = () => {
-    let info = document.getElementById('extra-info-card');
-    let icon_up = document.getElementById('extra-icon-up');
-    let icon_down = document.getElementById('extra-icon-down');
-
-    if (is_open('extra-info-card')) {
-      info.style.direction = "none";
-      icon_down.style.display = 'block'
-      icon_up.style.display = 'none';
-
-    } else {
-      info.style.direction = "flex";
-      icon_up.style.display = 'block';
-      icon_down.style.display = 'none'
-    }
-
-    info.style.display = is_open('extra-info-card') ? 'none' : 'flex';
-  }
 
   let extra_rows = document.getElementsByClassName("extra-t");
   for (const row of extra_rows) {
@@ -112,6 +99,7 @@ const set_chat_onclicks = async (user) => {
 
   document.getElementById('ban_user').onclick = async () => {
     await ban_user(user.id)
+    location.reload();
   }
 }
 
@@ -121,6 +109,9 @@ const set_msg_loader = async (user) => {
   chat.onscroll = function() {
     if (chat.scrollTop == 0) {
       render_user_messages(user);
+    }
+    if (chat.scrollTop + chat.offsetHeight > chat.scrollHeight) {
+      remove_notify_element(user.id, user.nickname)
     }
   }
 }
@@ -207,41 +198,33 @@ const set_new_dialog = (user) => {
              <img src="../${user.avatar_path}" alt="avatar">
          </a>
          <div class="chat-about">
-             <h6 class="m-b-0">${user.nickname}</h6>
+          <p class="text-start">${user.nickname}</p>
          </div>
+         <div class="extra-info-t">
+          <p class="text-start text-secondary extra-t">@${user.username}</p>
+          <div id="CopyAlert" class="alert alert-success" role="alert">
+          Copied!
+        </div>
+        </div>
      </div>
      <div class="header-ban-extra">
      <div>
-      <button type="button" id="ban_user" value="${user.id}" class="btn btn-danger">Забанить</button>
+      <button type="button" data-bs-toggle="modal" data-bs-target="#myModal" value="${user.id}" class="btn btn-danger">Забанить</button>
      </div>
-     <div class="extra-info-icon btn" id="extra-info-btn">
-      <svg xmlns="http://www.w3.org/2000/svg" id="extra-icon-up" width="24" height="24" fill="currentColor" class="bi bi-caret-up" viewBox="0 0 16 16">
-        <path d="M3.204 11h9.592L8 5.519 3.204 11zm-.753-.659 4.796-5.48a1 1 0 0 1 1.506 0l4.796 5.48c.566.647.106 1.659-.753 1.659H3.204a1 1 0 0 1-.753-1.659z"/>
-      </svg>
-      <svg xmlns="http://www.w3.org/2000/svg" id="extra-icon-down" width="24" height="24" fill="currentColor" class="bi bi-caret-down" viewBox="0 0 16 16">
-        <path d="M3.204 5h9.592L8 10.481 3.204 5zm-.753.659 4.796 5.48a1 1 0 0 0 1.506 0l4.796-5.48c.566-.647.106-1.659-.753-1.659H3.204a1 1 0 0 0-.753 1.659z"/>
-      </svg>
-     </div>
-     <div class="card extra-info-card px-4 shadow-lg py-3" id="extra-info-card">
-      <div class="extra-info-row">
-        <div class="extra-info-h">
-          <p class="text-start text-black-50">Номер</p>
-        </div>
-        <div class="extra-info-t">
-          <p class="text-start extra-t">${user.number}</p>
-        </div>
+     <div class="modal" tabindex="-1" id="myModal">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Вы уверены, что хотите забанить пользователя?</h5>
       </div>
-      <div class="extra-info-row">
-      <div class="extra-info-h">
-        <p class="text-start text-black-50">Юзернейм</p>
-      </div>
-      <div class="extra-info-t">
-        <p class="text-start extra-t">${user.username}</p>
-      </div>
-      <div id="CopyAlert" class="alert alert-success" role="alert">
-        Copied!
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" data-bs-dismiss="modal">Нет</button>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal"  id="ban_user">Да</button>
       </div>
     </div>
+  </div>
+</div>
+
     </div>
 
       </div>
@@ -273,9 +256,9 @@ const set_new_dialog = (user) => {
 document.addEventListener('click', async (event) => {
     let target = event.target
   
-    if (target.id !== 'dialog') {
+    if (target.id.slice(0, 6) !== 'dialog') {
       let clst = target.classList
-      if (clst.contains('name') || clst.contains('about') || target.alt == 'avatar') {
+      if (clst.contains('name') || clst.contains('about') || target.alt == 'avatar' || target.id.slice(0, 6) == 'unread') {
         target = find_dialog_parent(event.target)
         if (!target) { return }
       } else { return }
@@ -288,5 +271,18 @@ document.addEventListener('click', async (event) => {
     set_new_dialog(user)
 });
 
+
+document.onreadystatechange = async () => {
+  if (document.readyState == "complete") {
+      let user_to_preload = document.getElementById('user_to_preload');
+      if (user_to_preload) {
+        let user = await get_user(user_to_preload.textContent);
+        let dialog_div = document.getElementById(`dialog_${user_to_preload.textContent}`);
+
+        set_active_dialog(dialog_div);
+        set_new_dialog(user)
+      }
+  }
+}
 
 export {set_active_dialog, set_new_dialog};

@@ -1,8 +1,8 @@
 """Initial migration
 
-Revision ID: 5aaf488c8a77
+Revision ID: e4424aabc2f6
 Revises: 
-Create Date: 2022-04-13 00:51:27.780423
+Create Date: 2022-04-14 23:35:37.490022
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = '5aaf488c8a77'
+revision = 'e4424aabc2f6'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -40,7 +40,9 @@ def upgrade():
     sa.Column('telegram_id', sa.Integer(), nullable=False),
     sa.Column('nickname', sa.String(length=255), nullable=False),
     sa.Column('username', sa.String(length=255), nullable=True),
+    sa.Column('unread_count', sa.Integer(), server_default='0', nullable=True),
     sa.Column('avatar_path', sa.String(length=255), nullable=True),
+    sa.Column('is_banned', sa.Boolean(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('telegram_id')
     )

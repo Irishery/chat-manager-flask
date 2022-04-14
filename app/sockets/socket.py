@@ -49,9 +49,6 @@ def send_message(message, user):
                                                        namespace='/')
 
     for socket in socket_ids:
-        if socket in sockets_with_dialog.keys():
-            if sockets_with_dialog[socket] == user.id:
-                continue
 
         emit('send_notification', {'id': user.id, 'name': user.nickname}, 
                                     room=socket, namespace='/')

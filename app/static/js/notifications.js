@@ -4,24 +4,30 @@ import {set_new_dialog, set_active_dialog} from './rendermessages.js'
 
 let notify_snd = new Audio("../static/audio/Notification.wav");
 
-socket.on('send_notification', function(data) {
+socket.on('send_notification', async function(data) {
     render_socket_notification(data);
-    play_audio_notify();
 });
 
 
-const play_audio_notify = () => {
-    console.log('AA')
+const play_audio_notify = async () => {
+    await new Promise(r => setTimeout(r, 1500));
     notify_snd.play()
 }
 
-const remove_notify_element = (id) => {
+const remove_notify_element = async (id, name) => {
     let notify = document.getElementById(`user_${id}`)
-    
+    if (!notify) {
+        return
+    }
+
+    let unread_flag = document.getElementById(`unread_${id}`)
+    let manager_id = document.getElementById('manager-id').textContent;
+
+    await del_notification(manager_id, id, name)
     notify.remove()
+    unread_flag.remove()
 
     let notifys_dropdown = document.getElementById('dropdown-notify')
-
     if (!(notifys_dropdown.children.length - 1)) {
         document.getElementById('default-notification').style = 'block';
     }
@@ -29,7 +35,7 @@ const remove_notify_element = (id) => {
 
 
 const check_notification = async (notify) => {
-    let manager_id = document.getElementById('manager-id').textContent;
+
     let dialog_div = document.getElementById(`dialog_${notify.id}`).parentNode
 
     let user = await get_user(notify.id)
@@ -39,9 +45,7 @@ const check_notification = async (notify) => {
     set_active_dialog(dialog_div)
     set_new_dialog(user)
 
-    await del_notification(manager_id, notify.id, notify.name)
-
-    remove_notify_element(notify.id)
+    remove_notify_element(notify.id, notify.name)
 }
 
 const render_server_notifications = async () => {
@@ -60,7 +64,7 @@ const render_server_notifications = async () => {
         if (!same_notify) {
             notify_div.insertAdjacentHTML(
             "afterbegin",
-            `<a class="dropdown-item text-break" id='user_${notify.id}' value='${notify.id}'}>
+            `<a class="dropdown-item text-break" id='user_${notify.id}' value='${notify.id}'>
                 Новое сообщение от ${notify.name}
             </a>`
             )
@@ -73,15 +77,41 @@ const render_server_notifications = async () => {
 }
 
 
-const render_socket_notification = (data) => {
-    console.log(data);
+const render_socket_notification = async (data) => {
+    let manager_id = document.getElementById('manager-id').textContent;
     let default_notification = document.getElementById('default-notification');
     let notify_div = document.getElementById('dropdown-notify');
     let same_notify = document.getElementById(`user_${data.id}`)
+    let dialog = document.getElementById(`dialog_${data.id}`)
+    let unread_flag = document.getElementById(`unread_${data.id}`)
+
+    if (dialog.classList.contains('active-dialog')) {
+        await del_notification(manager_id, data.id, data.name)
+        return
+    }
+
+    play_audio_notify()
+    let user = await get_user(data.id)
+
 
     if (default_notification) {
         default_notification.style.display = "none";
     };
+
+    if (unread_flag) {
+        unread_flag.textContent = parseInt(unread_flag.textContent) + 1
+    } else if (user.unread_count > 0) {
+        dialog.insertAdjacentHTML(
+            'beforeend',
+            `
+            <div class="unread_msgs rounded-circle">
+                <p id="unread_${data.id}" class="text-white bg-info rounded-circle">${user.unread_count}</p>
+            </div>
+            `
+        )
+    }
+
+
 
     if (!same_notify) {
         notify_div.insertAdjacentHTML(
@@ -125,3 +155,6 @@ document.onclick = function(element) {
         notifications.style.display = 'none'
     }
 }
+
+
+export {remove_notify_element}

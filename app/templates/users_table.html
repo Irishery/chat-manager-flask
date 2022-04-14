@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="py-3 px-lg-4">
+    <div class="container px-4">
+      <div class="row">
+        
+        <table id="bots" class="table align-middle table-striped table-bordered" cellspacing="0" width="100%">
+          <thead class="table-dark">
+            <tr>
+              <th>action</th>
+              <th>telegram_id</th>
+              <th>nickname</th>
+              <th>username</th>
+              <th>is_banned</th>
+              <th>unread_count</th>
+            </tr>
+          </thead>
+          <tfoot class="table-dark">
+            <tr>
+                <th>action</th>
+                <th>telegram_id</th>
+                <th>nickname</th>
+                <th>username</th>
+                <th>is_banned</th>
+                <th>unread_count</th>
+            </tr>
+          </tfoot>
+          {% for user in users %}
+            <tr id="show-info{{ user.id }}" value="{{ user.id }}">
+              <td>
+                <a href="/?user_id={{ user.id }}" class="btn btn-dark" role="button">Открыть диалог</a>
+            </td>
+              <td>{{ user.telegram_id }}</td>
+              <td>{{ user.nickname }}</td>
+              <td>{{ user.username }}</td>
+              <td>{{ user.is_banned }}</td>
+              <td>{{ user.unread_count }}</td>
+            </tr>
+          {% endfor %}    
+        </tbody>
+        </table>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    $(document).ready(function() {
+        $("#bots").DataTable({
+            "scrollX": true
+        });
+        $('.dataTables_length').addClass('bs-select');
+        
+        $('.dataTables_filter').css({display: "flex"});
+        $('.dataTables_filter').addClass('justify-content-end');
+
+        $('.pagination').addClass('justify-content-end');
+
+      });
+
+  </script>
+  {% endblock %}

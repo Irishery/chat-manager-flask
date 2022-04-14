@@ -229,7 +229,7 @@ ul {
     float: right
 }
 
-#manager-id {
+.hide_it {
     display: none;
 }
 
@@ -245,15 +245,6 @@ ul {
     background-color: rgba(13, 202, 240, 15%) !important;
 }
 
-.clearfix:after {
-    visibility: hidden;
-    display: block;
-    font-size: 0;
-    content: " ";
-    clear: both;
-    height: 0
-}
-
 #chat-input {
     margin-right: 20px;
 }
@@ -262,8 +253,7 @@ ul {
     display: none;
     z-index: 100;
     position: absolute;
-    right: 90%;
-    top: 0;
+    top: 5%;
 }
 
 #extra-icon-up {
@@ -278,7 +268,32 @@ ul {
 }
 
 #header-avatar {
+    display: flex;
     width: auto;
+}
+
+.chat-about p:first-child {
+    margin-right: 0.25rem;
+}
+
+.modal-header {
+    border-bottom: none;
+}
+
+.modal-footer {
+    border-top: none;
+}
+
+.unread_msgs {
+    align-self: center;
+    max-height: 25px;
+    min-width: 30px;
+    text-align: center;
+    margin: 0;
+}
+
+.unread_msgs p {
+    padding: 3px;
 }
 
 .header-ban-extra{

@@ -5,9 +5,12 @@
 {% endblock %}
 
 {% block content %}
-<div id="manager-id">
+<div id="manager-id" class="hide_it">
   {{ current_user.id }}
 </div>
+{% if user_id %}
+  <div id="user_to_preload" class="hide_it">{{ user_id }}</div>
+{% endif %}
 <div class="container">
 <div class="row clearfix">
     <div class="col-lg-12">
@@ -20,13 +23,20 @@
                 <ul class="list-unstyled chat-list mt-2 mb-0" id="user-list">
                     {% for user in users %}
                       {% if not user.is_banned %}
-                        <li class="clearfix d-flex" id="dialog" value="{{ user.id }}">
-                          <div class="diaolg-id" id="dialog_{{ user.id }}"></div>
-                            <img src="../{{ user.avatar_path }}" alt="avatar">
-                            <div class="about">
-                                <div class="name">{{ user.nickname }}</div>
-                                <!-- <div class="status"> <i class="fa fa-circle offline"></i> left 7 mins ago </div>                                             -->
+                        <li class="d-flex justify-content-between" id="dialog_{{ user.id }}" value="{{ user.id }}">
+                          <!-- <div class="diaolg-id" id="dialog_{{ user.id }}"></div> -->
+                            <div class="avatar_and_nickname">
+                              <img src="../{{ user.avatar_path }}" alt="avatar">
+                              <div class="about">
+                                  <div class="name">{{ user.nickname }}</div>
+                                  <!-- <div class="status"> <i class="fa fa-circle offline"></i> left 7 mins ago </div>                                             -->
+                              </div>
                             </div>
+                            {% if user.unread_count != 0%}
+                              <div class="unread_msgs rounded-circle">
+                                <p  id="unread_{{ user.id }}" class="text-white bg-info rounded-circle">{{ user.unread_count }}</p>
+                              </div>
+                            {% endif %}
                         </li>
                       {% endif %}
                     {% endfor %}
@@ -70,4 +80,5 @@
       }
     }
     </script>
+
 {% endblock %}

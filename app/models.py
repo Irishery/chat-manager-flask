@@ -46,18 +46,18 @@ class User(db.Model):
     telegram_id: int = db.Column(db.Integer, unique=True, nullable=False)
     nickname: str = db.Column(db.String(255), nullable=False)
     username: str = db.Column(db.String(255), default='None')
-    number: str = db.Column(db.String(255), default='None')
+    unread_count: int = db.Column(db.Integer, server_default='0')
     avatar_path: str = db.Column(db.String(255), nullable=True, 
                                 default='static/images/default_avatar.jpg')
-    is_banned: Boolean = db.Column(db.Boolean, default='false')
+    is_banned: Boolean = db.Column(db.Boolean, default=False)
 
-    def __init__(self, telegram_id, username, nickname, number):
+    def __init__(self, telegram_id, username, nickname, unread_count=None):
         self.telegram_id = telegram_id
         self.nickname = nickname
         if username:
             self.username = username
-        if number:
-            self.number = number
+        if unread_count:
+            self.unread_count = unread_count
 
 
     def add_user(self):

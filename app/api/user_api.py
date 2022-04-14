@@ -90,6 +90,9 @@ def delete_notifications():
     user_id = data['user_id']
     nickname = data['nickname']
 
+    user = User.query.filter_by(id=user_id).first()
+    user.unread_count = 0
+
     db.session.execute(update(Manager).filter_by(id=manager_id)\
     .values(unread_msgs=text(f'array_remove({Manager.unread_msgs.name}, :tag)')),
     {'tag': str(user_id) + f'_{nickname}'})
@@ -110,6 +113,7 @@ def send_message_to_manager():
 
     user = User.query.filter_by(telegram_id=data['telegram_id']).first()
 
+    user.unread_count += 1
     db.session.execute(update(
         Manager
     ).values(unread_msgs=text(f'array_append({Manager.unread_msgs.name}, :tag)')),
