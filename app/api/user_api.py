@@ -39,6 +39,16 @@ def add_user():
     return jsonify(user)
 
 
+@user_api.route('/api/user/', methods=["UPDATE"])
+def ban_user():
+    data = request.args.to_dict()
+    user_id = data['user_id']
+    user = User.query.filter_by(id=user_id).first()
+    user.is_banned = True
+    db.session.commit()
+    return {'status': f'user_{user_id} has been banned'}
+
+
 @user_api.route('/api/user/pic/', methods=['POST'])
 def add_user_avatar():
     data = request.get_data()
@@ -53,7 +63,7 @@ def add_user_avatar():
     im = Image.open(BytesIO(base64.b64decode(data)))
     im.save('app/' + avatar_path, 'jpeg')
     
-    return {'ok': 'ok'}
+    return {'status': 'ok'}
 
 
 @user_api.route('/api/manager/notifications/', methods=['GET'])

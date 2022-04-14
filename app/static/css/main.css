@@ -254,6 +254,75 @@ ul {
     height: 0
 }
 
+#chat-input {
+    margin-right: 20px;
+}
+
+#CopyAlert {
+    display: none;
+    z-index: 100;
+    position: absolute;
+    right: 90%;
+    top: 0;
+}
+
+#extra-icon-up {
+    display: none;
+}
+
+.extra-info-icon {
+    display: flex;
+    width: auto;
+    height: auto;
+    align-items: center;
+}
+
+#header-avatar {
+    width: auto;
+}
+
+.header-ban-extra{
+    width: auto;
+    display: flex;
+}
+
+.extra-info-card {
+    z-index: 100;
+    display: none;
+    flex-direction: column-reverse;
+    width: auto;
+    height: auto;
+    position: absolute;
+    right: 0;
+    margin-top: 50px;
+}
+
+.row .col-lg-6 {
+    width: auto;
+}
+
+.extra-info-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.extra-t {
+    cursor: copy;
+}
+
+.extra-info-row:first-child p {
+    margin-bottom: 0;
+}
+
+.extra-info-h {
+    margin-right: 1rem;
+}
+
+.header-div {
+    display: flex;
+    justify-content: space-between;
+}
+
 .chat-history {
     max-height: 550px;
     overflow-x: auto;

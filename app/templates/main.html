@@ -19,14 +19,16 @@
                 <div class="dialogs-group">
                 <ul class="list-unstyled chat-list mt-2 mb-0" id="user-list">
                     {% for user in users %}
-                    <li class="clearfix d-flex" id="dialog" value="{{ user.id }}">
-                      <div class="diaolg-id" id="dialog_{{ user.id }}"></div>
-                        <img src="../{{ user.avatar_path }}" alt="avatar">
-                        <div class="about">
-                            <div class="name">{{ user.nickname }}</div>
-                            <!-- <div class="status"> <i class="fa fa-circle offline"></i> left 7 mins ago </div>                                             -->
-                        </div>
-                    </li>
+                      {% if not user.is_banned %}
+                        <li class="clearfix d-flex" id="dialog" value="{{ user.id }}">
+                          <div class="diaolg-id" id="dialog_{{ user.id }}"></div>
+                            <img src="../{{ user.avatar_path }}" alt="avatar">
+                            <div class="about">
+                                <div class="name">{{ user.nickname }}</div>
+                                <!-- <div class="status"> <i class="fa fa-circle offline"></i> left 7 mins ago </div>                                             -->
+                            </div>
+                        </li>
+                      {% endif %}
                     {% endfor %}
                 </ul>
                 </div>

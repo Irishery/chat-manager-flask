@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
+from email.policy import default
+from xmlrpc.client import Boolean
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from flask_login import LoginManager
@@ -44,14 +46,20 @@ class User(db.Model):
     telegram_id: int = db.Column(db.Integer, unique=True, nullable=False)
     nickname: str = db.Column(db.String(255), nullable=False)
     username: str = db.Column(db.String(255), default='None')
+    number: str = db.Column(db.String(255), default='None')
     avatar_path: str = db.Column(db.String(255), nullable=True, 
                                 default='static/images/default_avatar.jpg')
+    is_banned: Boolean = db.Column(db.Boolean, default='false')
 
-    def __init__(self, telegram_id, username, nickname):
+    def __init__(self, telegram_id, username, nickname, number):
         self.telegram_id = telegram_id
         self.nickname = nickname
-        self.username = username
-    
+        if username:
+            self.username = username
+        if number:
+            self.number = number
+
+
     def add_user(self):
         db.session.add(self)
         db.session.commit()

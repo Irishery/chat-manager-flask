@@ -1,4 +1,4 @@
-import {get_messages, get_user, send_message} from './api_methods.js'
+import {ban_user, get_messages, get_user, send_message} from './api_methods.js'
 import {socket} from './socket_client.js'
 
 let last_msg_id = 0;
@@ -50,7 +50,7 @@ const block_send_on_typing = (input) => {
 }
 
 
-const set_msg_onclick = async (user) => {
+const set_chat_onclicks = async (user) => {
   block_send_on_typing(document.getElementById('chat-input'))
   
   document.getElementById('send-msg').onclick = async () => {
@@ -76,6 +76,43 @@ const set_msg_onclick = async (user) => {
       }
     }
   }, false);
+
+  document.getElementById('extra-info-btn').onclick = () => {
+    let info = document.getElementById('extra-info-card');
+    let icon_up = document.getElementById('extra-icon-up');
+    let icon_down = document.getElementById('extra-icon-down');
+
+    if (is_open('extra-info-card')) {
+      info.style.direction = "none";
+      icon_down.style.display = 'block'
+      icon_up.style.display = 'none';
+
+    } else {
+      info.style.direction = "flex";
+      icon_up.style.display = 'block';
+      icon_down.style.display = 'none'
+    }
+
+    info.style.display = is_open('extra-info-card') ? 'none' : 'flex';
+  }
+
+  let extra_rows = document.getElementsByClassName("extra-t");
+  for (const row of extra_rows) {
+    row.onclick = () => {
+      navigator.clipboard.writeText(row.textContent)
+      
+      let alert = document.getElementById("CopyAlert");
+      alert.style.display = 'block'
+      // $("#CopyAlert").alert()
+      $("#CopyAlert").fadeTo(1000, 500).slideUp(500, function(){
+        alert.style.display = 'none'
+    });
+    }
+  }
+
+  document.getElementById('ban_user').onclick = async () => {
+    await ban_user(user.id)
+  }
 }
 
 
@@ -164,14 +201,50 @@ const set_new_dialog = (user) => {
   chat.insertAdjacentHTML(
   "afterbegin",
 `<div class="chat-header clearfix" id="chat-header">
- <div class="row">
-     <div class="col-lg-6">
+ <div class="row header-div">
+     <div class="col-lg-6" id="header-avatar">
          <a href="javascript:void(0);" data-toggle="modal" data-target="#view_info">
              <img src="../${user.avatar_path}" alt="avatar">
          </a>
          <div class="chat-about">
              <h6 class="m-b-0">${user.nickname}</h6>
          </div>
+     </div>
+     <div class="header-ban-extra">
+     <div>
+      <button type="button" id="ban_user" value="${user.id}" class="btn btn-danger">Забанить</button>
+     </div>
+     <div class="extra-info-icon btn" id="extra-info-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" id="extra-icon-up" width="24" height="24" fill="currentColor" class="bi bi-caret-up" viewBox="0 0 16 16">
+        <path d="M3.204 11h9.592L8 5.519 3.204 11zm-.753-.659 4.796-5.48a1 1 0 0 1 1.506 0l4.796 5.48c.566.647.106 1.659-.753 1.659H3.204a1 1 0 0 1-.753-1.659z"/>
+      </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" id="extra-icon-down" width="24" height="24" fill="currentColor" class="bi bi-caret-down" viewBox="0 0 16 16">
+        <path d="M3.204 5h9.592L8 10.481 3.204 5zm-.753.659 4.796 5.48a1 1 0 0 0 1.506 0l4.796-5.48c.566-.647.106-1.659-.753-1.659H3.204a1 1 0 0 0-.753 1.659z"/>
+      </svg>
+     </div>
+     <div class="card extra-info-card px-4 shadow-lg py-3" id="extra-info-card">
+      <div class="extra-info-row">
+        <div class="extra-info-h">
+          <p class="text-start text-black-50">Номер</p>
+        </div>
+        <div class="extra-info-t">
+          <p class="text-start extra-t">${user.number}</p>
+        </div>
+      </div>
+      <div class="extra-info-row">
+      <div class="extra-info-h">
+        <p class="text-start text-black-50">Юзернейм</p>
+      </div>
+      <div class="extra-info-t">
+        <p class="text-start extra-t">${user.username}</p>
+      </div>
+      <div id="CopyAlert" class="alert alert-success" role="alert">
+        Copied!
+      </div>
+    </div>
+    </div>
+
+      </div>
      </div>
  </div>
 </div>
@@ -181,7 +254,7 @@ const set_new_dialog = (user) => {
 </div>
 <div class="chat-message clearfix" id="chat-input-div">
 <div class="input-group mb-0">
-    <input type="text" id="chat-input" class="form-control" placeholder="Enter text here...">                                    
+    <textarea type="text" id="chat-input" class="form-control" placeholder="Enter text here..."></textarea>                                
     <div class="input-group-prepend">
       <button class="btn btn-outline-secondary" type="button" id="send-msg">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-send" viewBox="0 0 16 16">
@@ -191,7 +264,7 @@ const set_new_dialog = (user) => {
     </div>
 </div>
 `)
-  set_msg_onclick(user);
+  set_chat_onclicks(user);
   set_msg_loader(user);
   render_user_messages(user);
 }

@@ -37,9 +37,13 @@ const del_notification = (manager_id, user_id, nickname) => {
                         nickname: nickname})
 };
 
+const ban_user = (user_id) => {
+    return base_request('user', 'UPDATE', {user_id: user_id})
+};
+
 const get_user = (id) => {
     return base_request('user', 'GET', {id: id, type: 'id'})
 };
 
 export {get_messages, get_user, send_message, get_notifications, 
-        del_notification};
+        del_notification, ban_user};

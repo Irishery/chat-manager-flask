@@ -1,9 +1,9 @@
-const menu_open = () => {
-    let menu = document.getElementById('dropdown-profile');
-    return menu.style.display == 'block';
+const is_open = (id) => {
+    let element = document.getElementById(id);
+    return (element.style.display == 'block') | element.style.display == 'flex';
 }
 
 document.getElementById('navbarDropdownMenuLink').onclick = function openMenu() {
     let menu = document.getElementById('dropdown-profile');
-    menu.style.display = menu_open() ? 'none' : 'block';
+    menu.style.display = is_open('dropdown-profile') ? 'none' : 'block';
 }

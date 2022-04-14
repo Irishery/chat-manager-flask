@@ -2,10 +2,18 @@ import {get_notifications, get_user, del_notification} from './api_methods.js'
 import {socket} from './socket_client.js'
 import {set_new_dialog, set_active_dialog} from './rendermessages.js'
 
+let notify_snd = new Audio("../static/audio/Notification.wav");
+
 socket.on('send_notification', function(data) {
-    render_socket_notification(data)
+    render_socket_notification(data);
+    play_audio_notify();
 });
 
+
+const play_audio_notify = () => {
+    console.log('AA')
+    notify_snd.play()
+}
 
 const remove_notify_element = (id) => {
     let notify = document.getElementById(`user_${id}`)
@@ -110,7 +118,7 @@ document.onclick = function(element) {
     let menu = document.getElementById('dropdown-profile');
     let notifications = document.getElementById('dropdown-notify');
 
-    if (menu_open() && !(element.target.id == 'navbarDropdownMenuLink' | element.target.id == 'navbarDropdownMenuImg')) {
+    if (is_open('dropdown-profile') && !(element.target.id == 'navbarDropdownMenuLink' | element.target.id == 'navbarDropdownMenuImg')) {
         menu.style.display = 'none'
     }
     if (notifications_open() && !(element.target.id == 'notification-btn' | element.target.id == 'bell-icon')) {
