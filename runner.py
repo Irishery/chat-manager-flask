@@ -11,4 +11,7 @@ if __name__ == '__main__':
     # with app.app_context():
         # db.create_all()
         # db.drop_all()
-    socketio.run(app)
+    host = os.getenv('HOST')
+    port = os.getenv('PORT')
+    print(host, port)
+    socketio.run(app, host=host, port=port)

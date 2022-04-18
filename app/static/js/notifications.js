@@ -17,6 +17,7 @@ const play_audio_notify = async () => {
 const remove_notify_element = async (id, name) => {
     let notify = document.getElementById(`user_${id}`)
     if (!notify) {
+	console.log(notify)
         return
     }
 

@@ -57,7 +57,7 @@ const block_send_on_typing = (input) => {
 
 const set_chat_onclicks = async (user) => {
   block_send_on_typing(document.getElementById('chat-input'))
-  
+
   document.getElementById('send-msg').onclick = async () => {
     let input = document.getElementById('chat-input');
     let text = input.value
@@ -87,7 +87,7 @@ const set_chat_onclicks = async (user) => {
   for (const row of extra_rows) {
     row.onclick = () => {
       navigator.clipboard.writeText(row.textContent)
-      
+
       let alert = document.getElementById("CopyAlert");
       alert.style.display = 'block'
       // $("#CopyAlert").alert()
@@ -111,6 +111,7 @@ const set_msg_loader = async (user) => {
       render_user_messages(user);
     }
     if (chat.scrollTop + chat.offsetHeight > chat.scrollHeight) {
+      console.log(user);
       remove_notify_element(user.id, user.nickname)
     }
   }
@@ -134,7 +135,7 @@ const render_new_message = (text, role) => {
 
 const render_user_messages = async (user) => {
   let messages = await get_messages(user.id, last_msg_id);
-  let chat_history = document.getElementById('chat-history')  
+  let chat_history = document.getElementById('chat-history')
 
   if (messages.length == 0) {
     let dialog_begin = document.getElementById('dialog-begin-flag');
