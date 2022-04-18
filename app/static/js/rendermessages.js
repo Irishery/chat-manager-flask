@@ -9,6 +9,31 @@ socket.on('send_message', function(Message) {
   render_new_message(Message.message, 'user')
 });
 
+// return a promise
+function copyToClipboard(textToCopy) {
+  // navigator clipboard api needs a secure context (https)
+  if (navigator.clipboard && window.isSecureContext) {
+      // navigator clipboard api method'
+      return navigator.clipboard.writeText(textToCopy);
+  } else {
+      // text area method
+      let textArea = document.createElement("textarea");
+      textArea.value = textToCopy;
+      // make the textarea out of viewport
+      textArea.style.position = "fixed";
+      textArea.style.left = "-999999px";
+      textArea.style.top = "-999999px";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      return new Promise((res, rej) => {
+          // here the magic happens
+          document.execCommand('copy') ? res() : rej();
+          textArea.remove();
+      });
+  }
+}
+
 const set_active_dialog = (target) => {
   let active = document.getElementsByClassName('active-dialog');
   if (active.length !== 0) {
@@ -64,7 +89,6 @@ const set_chat_onclicks = async (user) => {
     if (input.value && !typing) {
       input.value = ''
       let sent = await send_message(user.telegram_id, text, user.nickname);
-      // todo: check is status ok and show alert if its not
       render_new_message(text, 'manager');
     }
   }
@@ -86,8 +110,15 @@ const set_chat_onclicks = async (user) => {
   let extra_rows = document.getElementsByClassName("extra-t");
   for (const row of extra_rows) {
     row.onclick = () => {
+<<<<<<< HEAD
       navigator.clipboard.writeText(row.textContent)
 
+=======
+      copyToClipboard(row.textContent)
+        .then(() => console.log('text copied !'))
+        .catch(() => console.log('error'));
+      
+>>>>>>> 2c8bc13cb15a1b4b3d4f3f50f95b79462379c5fe
       let alert = document.getElementById("CopyAlert");
       alert.style.display = 'block'
       // $("#CopyAlert").alert()
