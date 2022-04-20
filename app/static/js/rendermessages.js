@@ -110,15 +110,10 @@ const set_chat_onclicks = async (user) => {
   let extra_rows = document.getElementsByClassName("extra-t");
   for (const row of extra_rows) {
     row.onclick = () => {
-<<<<<<< HEAD
-      navigator.clipboard.writeText(row.textContent)
-
-=======
       copyToClipboard(row.textContent)
         .then(() => console.log('text copied !'))
         .catch(() => console.log('error'));
-      
->>>>>>> 2c8bc13cb15a1b4b3d4f3f50f95b79462379c5fe
+
       let alert = document.getElementById("CopyAlert");
       alert.style.display = 'block'
       // $("#CopyAlert").alert()
