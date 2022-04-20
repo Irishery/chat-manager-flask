@@ -21,6 +21,11 @@ const get_messages = (id, last_msg_id) => {
     return base_request('message', 'GET', {msg_id: last_msg_id, id: id})
 };
 
+const get_dialogs = (last_dialog_id, last_unread_count) => {
+    return base_request('dialog', 'GET', {id: last_dialog_id,
+                                          unread: last_unread_count})
+}
+
 const send_message = (id, text, nickname) => {
     return base_request('message/manager', 'POST', {telegram_id: id,
                                                     message_text: text,
@@ -46,4 +51,4 @@ const get_user = (id) => {
 };
 
 export {get_messages, get_user, send_message, get_notifications, 
-        del_notification, ban_user};
+        del_notification, ban_user, get_dialogs};
