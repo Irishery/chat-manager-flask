@@ -36,8 +36,7 @@ const remove_notify_element = async (id, name) => {
 
 
 const check_notification = async (notify) => {
-
-    let dialog_div = document.getElementById(`dialog_${notify.id}`).parentNode
+    let dialog_div = document.getElementById(`dialog_${notify.id}`)
 
     let user = await get_user(notify.id)
 

@@ -14,6 +14,8 @@
               <th>username</th>
               <th>is_banned</th>
               <th>unread_count</th>
+              <th>call_name</th>
+              <th>call_contact</th>
             </tr>
           </thead>
           <tfoot class="table-dark">
@@ -24,6 +26,8 @@
                 <th>username</th>
                 <th>is_banned</th>
                 <th>unread_count</th>
+                <th>call_name</th>
+                <th>call_contact</th>
             </tr>
           </tfoot>
           {% for user in users %}
@@ -36,6 +40,8 @@
               <td>{{ user.username }}</td>
               <td>{{ user.is_banned }}</td>
               <td>{{ user.unread_count }}</td>
+              <td>{{ user.name }}</td>
+              <td>{{ user.contact }}</td>
             </tr>
           {% endfor %}    
         </tbody>

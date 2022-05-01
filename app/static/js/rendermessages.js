@@ -1,12 +1,13 @@
 import {ban_user, get_messages, get_user, send_message} from './api_methods.js'
 import {socket} from './socket_client.js'
 import {remove_notify_element} from './notifications.js'
+import {render_dialogs} from './render_dialogs.js'
 
 let last_msg_id = 0;
 let typing = false
 
 socket.on('send_message', function(Message) {
-  render_new_message(Message.message, 'user')
+  render_new_message(Message.message, 'user', Message.is_call)
 });
 
 // return a promise
@@ -44,6 +45,9 @@ const set_active_dialog = (target) => {
 
 
 const find_dialog_parent = (target) => {
+  if (target.classList.contains('avatar_and_nickname')) {
+    return target.parentNode;
+  };
   if (target.parentNode.classList.contains('avatar_and_nickname')) {
     let parent = target.parentNode.parentNode
     return parent.id.slice(0, 6) == 'dialog' ? parent : false
@@ -95,7 +99,7 @@ const set_chat_onclicks = async (user) => {
 
   document.addEventListener('keydown', async (event) => {
     var name = event.key;
-    if (name === 'Enter') {
+    if (name === 'Enter' && (event.ctrlKey)) {
       let input = document.getElementById('chat-input');
       let text = input.value
       if (input.value && !typing) {
@@ -144,24 +148,28 @@ const set_msg_loader = async (user) => {
 }
 
 
-const render_new_message = (text, role) => {
+const render_new_message = (text, role, is_call) => {
   let chat = document.getElementById('chat-history');
+  let chat_div = document.getElementById('chat-history-div')
 
   chat.insertAdjacentHTML(
     'beforeend',
     `  
-    <li class="clearfix">
+    <li class="clearfix ${is_call ? 'call' : ''}">
     <div class="message-data ${(role == 'manager') ? 'text-right text-right d-flex flex-row-reverse' : ''}">
       <span class="message-data-time">${new Date().toLocaleString().replace(",","").replace(/:.. /," ")}</span>
     </div>
       <div class="message ${(role == 'user') ? 'my-message' : 'other-message float-right'}">${text}</div>
     </li>`
   );
+
+  chat_div.scrollTop = chat_div.scrollHeight;
 }
 
 const render_user_messages = async (user) => {
   let messages = await get_messages(user.id, last_msg_id);
   let chat_history = document.getElementById('chat-history')
+  let chat_div = document.getElementById('chat-history-div')
 
   if (messages.length == 0) {
     let dialog_begin = document.getElementById('dialog-begin-flag');
@@ -186,7 +194,7 @@ const render_user_messages = async (user) => {
     chat_history.insertAdjacentHTML(
       'afterbegin',
       `
-    <li class="clearfix">
+    <li class="clearfix ${message.request_to_call ? 'call' : ''}">
     <div class="message-data ${(message.role == 'manager') ? 'text-right text-right d-flex flex-row-reverse' : ''}">
       <span class="message-data-time">${date.toLocaleString().replace(",","").replace(/:.. /," ")}</span>
     </div>
@@ -196,6 +204,8 @@ const render_user_messages = async (user) => {
     )
 
   }
+
+  chat_div.scrollTop = chat_div.scrollHeight;
 }
 
 
@@ -285,7 +295,7 @@ document.addEventListener('click', async (event) => {
   
     if (target.id.slice(0, 6) !== 'dialog') {
       let clst = target.classList
-      if (clst.contains('name') || clst.contains('about') || target.alt == 'avatar' || target.id.slice(0, 6) == 'unread') {
+      if (clst.contains('name') || clst.contains('about') || target.alt == 'avatar' || target.id.slice(0, 6) == 'unread' || clst.contains('avatar_and_nickname')) {
         target = find_dialog_parent(event.target)
         if (!target) { return }
       } else { return }
@@ -301,11 +311,13 @@ document.addEventListener('click', async (event) => {
 
 document.onreadystatechange = async () => {
   if (document.readyState == "complete") {
+      render_dialogs();
       let user_to_preload = document.getElementById('user_to_preload');
       if (user_to_preload) {
         let user = await get_user(user_to_preload.textContent);
         let dialog_div = document.getElementById(`dialog_${user_to_preload.textContent}`);
-
+	socket.emit('set_id', {socket_id: socket.id, 
+			       user_id: user.id})
         set_active_dialog(dialog_div);
         set_new_dialog(user)
       }

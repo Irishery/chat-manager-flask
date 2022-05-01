@@ -42,11 +42,11 @@ def set_id(data):
         dialogs_with_sockets[data['user_id']] = [data['socket_id']]
 
 
-def send_message(message, user):
+def send_message(message, user, is_call):
     if len(dialogs_with_sockets) > 0 and user.id in dialogs_with_sockets.keys():
         for socket in dialogs_with_sockets[user.id]:
-            emit('send_message', {'message': message}, room=socket,
-                                                       namespace='/')
+            emit('send_message', {'message': message, 'is_call': is_call},
+                                   room=socket, namespace='/')
 
     for socket in socket_ids:
 

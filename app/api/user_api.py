@@ -5,7 +5,7 @@ from PIL import Image
 from io import BytesIO
 
 from datetime import datetime
-from sqlalchemy import desc, text, update
+from sqlalchemy import desc, text, update, and_
 
 from flask import Blueprint, jsonify, request
 from app.models import User, Message, Manager, db
@@ -21,7 +21,7 @@ def get_user():
     data = request.args.to_dict()
     id = data['id']
     type = data['type']
-    if type == 'telegram':    
+    if type == 'telegram':
             return jsonify(User.query.filter_by(telegram_id=id).first())
     return jsonify(User.query.filter_by(id=id).first())
 
@@ -55,7 +55,7 @@ def add_user_avatar():
     params = request.args.to_dict()
     telegram_id = params['telegram_id']
     avatar_path = f'static/images/avatar_{telegram_id}.jpg'
-    
+
     user = User.query.filter_by(telegram_id=telegram_id).first()
     user.avatar_path = avatar_path
     db.session.commit()
@@ -108,11 +108,22 @@ def send_message_to_manager():
     data = request.args.to_dict()
     data['sent_datetime'] = datetime.now()
     data['role'] = 'user'
+    print('DATA')
+    print(data)
+    contact = data.pop('contact')
+    name = data.pop('name')
+    print(f'CONTACT {contact} NAME {name}')
+    print(data)
+    if data['request_to_call'] == 'true':
+        data['request_to_call'] = True
+    else:
+        data['request_to_call'] = False
     message = Message(**data)
     message.add_message()
 
     user = User.query.filter_by(telegram_id=data['telegram_id']).first()
-
+    user.name = name
+    user.contact = contact
     user.unread_count += 1
     db.session.execute(update(
         Manager
@@ -121,7 +132,7 @@ def send_message_to_manager():
 
     db.session.commit()
 
-    send_message(data['message_text'], user)
+    send_message(data['message_text'], user, data['request_to_call'])
     return jsonify(message)
 
 
@@ -139,6 +150,21 @@ def get_messages():
     return jsonify(Message.query.filter(
         Message.id < msg_id, Message.telegram_id==tel_id).
         order_by(desc(text('id'))).limit(20).all())
+
+
+@user_api.route('/api/dialog/', methods=['GET'])
+def get_dialogs():
+    data = request.args.to_dict()
+    ids = data['id'].split(',')
+    unread = data['unread']
+    print(type(ids))
+    print(ids)
+
+    if not ids[0]:
+        return jsonify(User.query.order_by(desc(text('unread_count'))).limit(20).all())
+
+    return jsonify(User.query.filter(and_(~User.id.in_(ids), User.unread_count <= unread))
+        .order_by(desc(text('unread_count'))).limit(20).all())
 
 
 @user_api.route('/api/message/manager/', methods=['POST'])

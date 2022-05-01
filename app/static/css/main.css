@@ -18,6 +18,7 @@ ul {
     box-shadow: 0 1px 2px 0 rgb(0 0 0 / 10%);
 }
 .chat-app .people-list {
+    overflow: hidden;
     width: 280px;
     left: 0;
     top: 0;
@@ -28,7 +29,7 @@ ul {
 
 .dialogs-group {
     overflow: auto;
-    max-height: 580px;
+    max-height: 470px;
 }
 
 .input-group input {
@@ -158,6 +159,7 @@ ul {
     display: inline-block;
     position: relative;
     max-width: 600px;
+    white-space: pre-line;
 }
 
 .chat .chat-history .message:after {
@@ -343,11 +345,32 @@ ul {
     overflow-x: auto;
 }
 
+.call .my-message {
+    background-color: #1d8ecd !important;
+    color:#fff !important;
+}
+
+#send-msg {
+    color: #1d8ecd;
+    border-color: #1d8ecd;
+}
+
+#send-msg:hover {
+    background-color: #1d8ecd;
+    color: #e8f1f3;
+}
+
+#send-msg:disabled {
+    color: #999;
+    border-color: #999;
+}
+
+
 @media only screen and (max-width: 767px) {
     .chat-app .people-list {
         max-height: 550px;
         width: 100%;
-        overflow-x: auto;
+        overflow-x: hidden;
         background: #fff;
         left: -400px;
     }
@@ -369,7 +392,6 @@ ul {
 @media only screen and (min-width: 768px) and (max-width: 992px) {
     .chat-app .chat-list {
         height: 650px;
-        overflow-x: auto
     }
     .chat-app .chat-history {
         height: 600px;

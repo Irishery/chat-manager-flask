@@ -49,6 +49,8 @@ class User(db.Model):
     unread_count: int = db.Column(db.Integer, server_default='0')
     avatar_path: str = db.Column(db.String(255), nullable=True, 
                                 default='static/images/default_avatar.jpg')
+    name: str = db.Column(db.String(255), default='None')
+    contact: str = db.Column(db.String(255), default='None')
     is_banned: Boolean = db.Column(db.Boolean, default=False)
 
     def __init__(self, telegram_id, username, nickname, unread_count=None):
@@ -73,14 +75,17 @@ class Message(db.Model):
     sent_datetime: datetime = db.Column(db.DateTime(timezone=True),
                                         nullable=False)
     nickname: str = db.Column(db.String(255), nullable=False)
+    request_to_call: bool = db.Column(db.Boolean, default=False)
     role: str = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, telegram_id, message_text, nickname, role, sent_datetime):
+    def __init__(self, telegram_id, message_text, nickname, role, sent_datetime,
+                 request_to_call=False):
         self.telegram_id = telegram_id
         self.message_text = message_text
         self.nickname = nickname
         self.role = role
         self.sent_datetime = sent_datetime
+        self.request_to_call = request_to_call
 
 
     def add_message(self):
