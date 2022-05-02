@@ -311,13 +311,15 @@ document.addEventListener('click', async (event) => {
 
 document.onreadystatechange = async () => {
   if (document.readyState == "complete") {
+      // wait for socket connection
+      await new Promise(resolve => setTimeout(resolve, 1000));
       render_dialogs();
       let user_to_preload = document.getElementById('user_to_preload');
       if (user_to_preload) {
         let user = await get_user(user_to_preload.textContent);
         let dialog_div = document.getElementById(`dialog_${user_to_preload.textContent}`);
-	socket.emit('set_id', {socket_id: socket.id, 
-			       user_id: user.id})
+        socket.emit('set_id', {socket_id: socket.id, 
+                  user_id: user.id})
         set_active_dialog(dialog_div);
         set_new_dialog(user)
       }

@@ -114,16 +114,18 @@ def send_message_to_manager():
     name = data.pop('name')
     print(f'CONTACT {contact} NAME {name}')
     print(data)
+    user = User.query.filter_by(telegram_id=data['telegram_id']).first()
+
     if data['request_to_call'] == 'true':
         data['request_to_call'] = True
+        user.name = name
+        user.contact = contact
     else:
         data['request_to_call'] = False
     message = Message(**data)
     message.add_message()
 
-    user = User.query.filter_by(telegram_id=data['telegram_id']).first()
-    user.name = name
-    user.contact = contact
+
     user.unread_count += 1
     db.session.execute(update(
         Manager
