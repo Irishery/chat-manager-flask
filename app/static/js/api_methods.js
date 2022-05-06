@@ -1,5 +1,5 @@
 const base_request = (path, method, data) => {
-    const request = new Request(`http://157.230.103.205:5000/api/${path}/?` + new URLSearchParams(data),
+    const request = new Request(`http://178.62.217.248:80/api/${path}/?` + new URLSearchParams(data),
     {method: method});
 
     return fetch(request)

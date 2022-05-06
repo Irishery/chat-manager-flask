@@ -1,4 +1,4 @@
-var socket = io("http://157.230.103.205:5000");
+var socket = io("http://178.62.217.248:80");
 socket.on('connect', function() {
     socket.emit('my event', {data: 'I\'m connected!'});
     
